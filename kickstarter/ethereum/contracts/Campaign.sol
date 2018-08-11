@@ -68,9 +68,9 @@ contract Campaign {
    
    function finalizeRequest(uint index) public privileged {
        Request storage request = requests[index];
-       
-       require(request.completed == false);
+
        require(request.approvalCount > (approversCount / 2));
+       require(!request.completed);
        
        request.receiver.transfer(request.value);
        request.completed = true;
