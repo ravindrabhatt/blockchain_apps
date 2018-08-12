@@ -3,14 +3,13 @@ import factory from '../ethereum/factory';
 
 class CampaignIndex extends Component {
 
-	async componentDidMount() {
-		const contracts = await factory.methods.getDeployedContracts().call();
-
-		console.log(contracts);
-	}
+  static async getInitialProps(){
+    const campaigns = await factory.methods.getDeployedContracts().call();
+    return {campaigns};
+  }
 
 	render() {
-		return <div>Index page!</div>
+		return <div>{this.props.campaigns[0]}</div>
 	}
 }
 
