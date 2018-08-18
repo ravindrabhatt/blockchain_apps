@@ -30,31 +30,31 @@ contract Campaign {
     Request[] public requests;
     
     function Campaign(uint minimum, address creator) public {
-        manager = creator;
-        minimumContribution = minimum;
+      manager = creator;
+      minimumContribution = minimum;
     }
     
    function contribute() public payable {
-       require(msg.value > minimumContribution);
-       
-       approvers[msg.sender] = true;
-       approversCount++;
+     require(msg.value > minimumContribution);
+     
+     approvers[msg.sender] = true;
+     approversCount++;
    }  
    
    function createSpendingRequest(
-       string description, 
-       uint value, 
-       address receiver) public privileged {
-       
-       Request memory newRequest = Request({
-           description: description,
-           value: value,
-           receiver: receiver,
-           completed: false,
-           approvalCount: 0
-       });     
-       
-       requests.push(newRequest);
+     string description, 
+     uint value, 
+     address receiver) public privileged {
+     
+     Request memory newRequest = Request({
+         description: description,
+         value: value,
+         receiver: receiver,
+         completed: false,
+         approvalCount: 0
+     });     
+     
+     requests.push(newRequest);
    }
    
    function approve(uint index) public contributor {
@@ -67,22 +67,36 @@ contract Campaign {
    }
    
    function finalizeRequest(uint index) public privileged {
-       Request storage request = requests[index];
+     Request storage request = requests[index];
 
-       require(request.approvalCount > (approversCount / 2));
-       require(!request.completed);
-       
-       request.receiver.transfer(request.value);
-       request.completed = true;
+     require(request.approvalCount > (approversCount / 2));
+     require(!request.completed);
+     
+     request.receiver.transfer(request.value);
+     request.completed = true;
+   }
+
+   function summary() public view returns (uint, uint, uint, uint, address) {
+     return (
+       minimumContribution,
+       this.balance,
+       requests.length,
+       approversCount,
+       manager  
+     );
    }
    
+   function getRequestsCount() public view returns (uint) {
+     return requests.length;
+   }
+
    modifier privileged() {
-       require(msg.sender == manager);
-       _;
+     require(msg.sender == manager);
+     _;
    }
    
    modifier contributor() {
-       require(approvers[msg.sender]);
-       _;
+     require(approvers[msg.sender]);
+     _;
    }   
 }
